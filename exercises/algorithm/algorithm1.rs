@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -20,6 +19,9 @@ impl<T> Node<T> {
             val: t,
             next: None,
         }
+    }
+    fn set_next(&mut self,t:NonNull<Node<T>>) {
+        self.next = Some(t);
     }
 }
 #[derive(Debug)]
@@ -69,15 +71,50 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
+    where T:PartialOrd 
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+
+        let length = list_a.length + list_b.length;
+        unsafe{
+            if list_a.start.unwrap().as_ref().val > list_b.start.unwrap().as_ref().val{ (list_a,list_b )= (list_b,list_a); }
+            let mut cur_b = list_b.start;
+            let mut last_a_ptr = list_a.start;
+            let mut cur_a = list_a.start.unwrap().as_ref().next;
+
+            while let Some(b_ptr) = cur_b {
+                let b_next = b_ptr.as_ref().next;
+                loop{
+                    match cur_a{
+                        Some(a_ptr) => {
+                            if a_ptr.as_ref().val > b_ptr.as_ref().val{
+                                // insert
+                                last_a_ptr.unwrap().as_mut().next = cur_b;
+                                cur_b.unwrap().as_mut().next = cur_a;
+                                last_a_ptr = cur_b;
+                                break;
+                            }else {
+                                last_a_ptr = cur_a;
+                                cur_a = a_ptr.as_ref().next;
+                            }
+                        },
+                        None => {
+                            last_a_ptr.unwrap().as_mut().next = cur_b;
+                            cur_b.unwrap().as_mut().next = None;
+                            cur_a = cur_b;
+                            break;
+                        },
+                    }
+                }
+                cur_b = b_next;
+            }
         }
-	}
+        Self{
+            length,
+            start: list_a.start,
+            end: list_a.end,
+        }
+    }
 }
 
 impl<T> Display for LinkedList<T>

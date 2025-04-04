@@ -1,0 +1,28 @@
+[package]
+name = "compiler"
+version = "0.1.0"
+edition = "2021"
+
+
+[package.metadata.scripts]
+run_m1 = "cargo run --bin m1"
+run_m2 = "cargo run --bin m2"
+run_m3 = "cargo run --bin m3"
+
+[[bin]]
+name = "algo1"
+path = "algorithm1.rs"
+
+[[bin]]
+name = "enums3.rs"
+path = "enums3.rs"
+[[bin]]
+name = "algo3"
+path = "algorithm3.rs"
+[[bin]]
+name = "algo4"
+path = "algorithm4.rs"
+[[bin]]
+name = "algo5"
+path = "algorithm5.rs"
+

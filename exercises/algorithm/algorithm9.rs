@@ -2,14 +2,15 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
+use std::fmt::Debug;
 
+#[derive(Debug)]
 pub struct Heap<T>
 where
-    T: Default,
+    T: Default + Debug 
 {
     count: usize,
     items: Vec<T>,
@@ -18,7 +19,7 @@ where
 
 impl<T> Heap<T>
 where
-    T: Default,
+    T: Default + Debug,
 {
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
@@ -33,11 +34,20 @@ where
     }
 
     pub fn is_empty(&self) -> bool {
-        self.len() == 0
+        self.count == 0
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.count+=1;
+        self.items.push(value);
+        let mut child = self.count;
+        let mut parent = self.parent_idx(child);
+        while (self.comparator)(&self.items[child],&self.items[parent]) && parent!=0{
+            self.items.swap(child, parent);
+            child = parent;
+            parent = self.parent_idx(child);
+        }
+        println!("{:?}",self);
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -56,15 +66,11 @@ where
         self.left_child_idx(idx) + 1
     }
 
-    fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
-    }
 }
 
 impl<T> Heap<T>
 where
-    T: Default + Ord,
+    T: Default + Ord + Debug,
 {
     /// Create a new MinHeap
     pub fn new_min() -> Self {
@@ -77,15 +83,66 @@ where
     }
 }
 
-impl<T> Iterator for Heap<T>
+impl<T> Iterator for Heap<T> 
 where
-    T: Default,
+    T: Default + Debug,
 {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        if self.count ==0 {
+            return None;
+        }
+        if self.count ==1 {
+            return self.items.pop();
+        }
+        let poped = self.items.pop().unwrap();
+        let taken = std::mem::replace(self.items.get_mut(1).unwrap(), poped);
+
+        let mut parent = 1;   
+        let mut l_child = self.left_child_idx(parent);   
+        let mut r_child = self.right_child_idx(parent);   
+
+        loop{
+            let p = self.items.get(parent).unwrap();
+            match (self.items.get(l_child),self.items.get(r_child)){
+                (None, None) => {break;},
+                (None, Some(r)) => {
+                    if (self.comparator)(r,p){
+                        self.items.swap(r_child,parent);
+                        parent = r_child;   
+                    }else {
+                        break;
+                    }
+                },
+                (Some(l), None) => {
+                    if (self.comparator)(l,p){
+                        self.items.swap(l_child,parent);
+                        parent = l_child;   
+                    }else {
+                        break;
+                    }
+                },
+                (Some(l), Some(r)) => {
+                    // 
+                    if (self.comparator)(l,r) && (self.comparator)(l,p){
+                        self.items.swap(l_child,parent);
+                        parent = l_child;   
+                    }else if (self.comparator)(r,p){
+                        self.items.swap(r_child,parent);
+                        parent = r_child;   
+                    }else {
+                        break;
+                    }
+                },
+            }
+            l_child = self.left_child_idx(parent);   
+            r_child = self.right_child_idx(parent);   
+        }
+        self.count -= 1;
+        println!("{:?}",self);
+        Some(taken)
     }
 }
 
@@ -95,7 +152,7 @@ impl MinHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord + Debug,
     {
         Heap::new(|a, b| a < b)
     }
@@ -107,7 +164,7 @@ impl MaxHeap {
     #[allow(clippy::new_ret_no_self)]
     pub fn new<T>() -> Heap<T>
     where
-        T: Default + Ord,
+        T: Default + Ord + Debug,
     {
         Heap::new(|a, b| a > b)
     }

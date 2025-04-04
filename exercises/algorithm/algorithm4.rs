@@ -3,7 +3,6 @@
 	This problem requires you to implement a basic interface for a binary tree
 */
 
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -50,13 +49,71 @@ where
 
     // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        if self.root.is_none(){
+            self.root = Some(Box::new(TreeNode::new(value)));
+            return;
+        }
+        let mut cur = self.root.as_mut().unwrap();
+        loop {
+            if cur.value == value{
+                // has been inserted before this insert call 
+                // do nothing
+                return;
+            }else if cur.value < value{
+                match cur.right{
+                    None => {
+                        cur.right = Some(Box::new(TreeNode::new(value)));
+                        return;
+                    },
+                    Some(ref mut node) => {
+                        cur = node;
+                    }
+                }
+            } else {
+                match cur.left{
+                    None => {
+                        cur.left = Some(Box::new(TreeNode::new(value)));
+                        return;
+                    },
+                    Some(ref mut node) => {
+                        cur = node;
+                    }
+                }
+            }
+        }   
+        panic!("will not reach here");
     }
 
     // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        if self.root.is_none(){
+            return false;
+        }
+        let mut cur = self.root.as_ref().unwrap();
+        loop {
+            if cur.value == value{
+                return true;
+            }else if cur.value < value{
+                match &cur.right{
+                    None => {
+                        return false;
+                    },
+                    Some(node) => {
+                        cur = node;
+                    }
+                }
+            } else {
+                match &cur.left{
+                    None => {
+                        return false;
+                    },
+                    Some(node) => {
+                        cur = node;
+                    }
+                }
+            }
+        }   
+        panic!("will not reach here");
     }
 }
 

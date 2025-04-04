@@ -34,10 +34,20 @@
 // Execute `rustlings hint tests7` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
 
-fn main() {}
-
+fn main() {
+    // 获取当前 UNIX 时间戳（秒）
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    
+    // 设置环境变量 TEST_FOO 为当前时间戳
+    println!("cargo:rustc-env=TEST_FOO={}", timestamp);
+    
+    // 告诉 Cargo 如果 build.rs 改变就重新运行
+    println!("cargo:rerun-if-changed=build.rs");
+}
 #[cfg(test)]
 mod tests {
     use super::*;
