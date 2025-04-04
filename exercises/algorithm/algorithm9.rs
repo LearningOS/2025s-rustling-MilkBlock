@@ -14,6 +14,7 @@ where
 {
     count: usize,
     items: Vec<T>,
+
     comparator: fn(&T, &T) -> bool,
 }
 
